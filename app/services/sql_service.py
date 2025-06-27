@@ -16,27 +16,22 @@ class SQLService:
                 raise ValueError(f"Tabela não permitida: '{table}'")
 
     def process_question(self, question: str):
-        # 1. Gera resposta do LLM (incluindo SQL)
-        response = self.llm.answer_question(question)
+        response = self.llm.generate_sql_with_context(question)
 
-        # 2. Extrai SQL entre blocos markdown
-        match = re.search(r"```sql\s+(.*?)```", response, re.DOTALL | re.IGNORECASE)
-        if not match:
+        sql_match = re.search(r"```sql\s+(.*?)```", response, re.DOTALL | re.IGNORECASE)
+        if not sql_match:
             raise ValueError("SQL não encontrado na resposta do LLM")
+        sql = sql_match.group(1).strip()
 
-        sql = match.group(1).strip()
-
-        # Extrai explicação
         explanation_match = re.search(r"Explicação:\s*(.*)", response, re.DOTALL | re.IGNORECASE)
         explanation = explanation_match.group(1).strip() if explanation_match else "Sem explicação fornecida."
 
-        # 3. Verifica tabelas permitidas
         self._validate_sql_tables(sql)
 
-        # 4. Executa a query limpa
         data = self.db.run_query(sql)
+
         return {
             "sql": re.sub(r"\s+", " ", sql).strip(),
             "data": data,
-            "explanation": explanation
+            "explanation": explanation,
         }
