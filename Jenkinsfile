@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        COMPOSE_PROJECT_NAME = "FinTechX_project"
+        COMPOSE_PROJECT_NAME = "fintechx_project"
     }
 
     stages {

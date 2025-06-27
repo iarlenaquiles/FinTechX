@@ -30,8 +30,23 @@ services:
       - "6379:6379"
     networks:
       - fintechx-net
-
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: root
+    networks:
+      - fintechx-net
 
 networks:
   fintechx-net:
     driver: bridge
+
+volumes:
+  jenkins_home:
