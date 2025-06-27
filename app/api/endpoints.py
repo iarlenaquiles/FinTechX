@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from sqlalchemy import text
 from app.services.retriever_service import RetrieverService
+from redis import Redis
 
 router = APIRouter()
 
@@ -119,9 +120,10 @@ documents = [
 ]
 
 retriever = RetrieverService(documents)
+redis_client = Redis(host='localhost', port=6379, db=0)
 
 def get_sql_service(db: Session = Depends(get_db)):
-    return SQLService(LLMService(retriever), DBRepository(db))
+    return SQLService(LLMService(retriever), DBRepository(db), redis_client)
 
 @router.post("/query")
 def query_data(request: QueryRequest, service: SQLService = Depends(get_sql_service)):
