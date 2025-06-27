@@ -12,10 +12,11 @@ openai==1.30.0
 
 # Validação e manipulação de SQL
 sqlglot==24.1.1
-sqlvalidator==1.0.0
+sqlvalidator==0.0.20
 
 # Cache (opcional)
 redis==5.0.4
+fastapi-cache2
 
 # Vetorização e RAG (opcional)
 faiss-cpu==1.8.0
@@ -37,3 +38,4 @@ loguru==0.7.2
 
 # Frontend (opcional)
 streamlit==1.35.0
+
