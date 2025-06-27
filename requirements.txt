@@ -1,0 +1,39 @@
+# Core Framework
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+
+# Banco de dados
+mysql-connector-python==8.4.0
+sqlalchemy==2.0.30
+pymysql
+
+# OpenAI e LLMs
+openai==1.30.0
+
+# Validação e manipulação de SQL
+sqlglot==24.1.1
+sqlvalidator==1.0.0
+
+# Cache (opcional)
+redis==5.0.4
+
+# Vetorização e RAG (opcional)
+faiss-cpu==1.8.0
+sentence-transformers==2.6.1
+
+# Segurança
+python-dotenv==1.0.1
+
+# Testes
+pytest==8.2.1
+httpx==0.27.0
+
+# Pydantic e tipagem
+pydantic==2.7.1
+pydantic-settings==2.2.1
+
+# Logs e observabilidade
+loguru==0.7.2
+
+# Frontend (opcional)
+streamlit==1.35.0
