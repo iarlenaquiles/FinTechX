@@ -1,0 +1,19 @@
+FROM jenkins/jenkins:lts
+
+USER root
+
+# Instala docker
+RUN apt-get update && \
+    apt-get install -y docker.io curl unzip
+
+# Instala Docker Compose V2 corretamente
+RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
+    curl -SL https://github.com/docker/compose/releases/download/v2.24.1/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose && \
+    chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+# Adiciona o usuário jenkins ao grupo docker
+RUN usermod -aG docker jenkins
+
+ENV DOCKER_CONFIG=/var/jenkins_home/.docker
+
+USER jenkins
