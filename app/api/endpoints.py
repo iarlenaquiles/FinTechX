@@ -7,6 +7,10 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from sqlalchemy import text
 from app.services.retriever_service import RetrieverService
+from redis import Redis
+import os
+from fastapi_cache.decorator import cache
+import time
 
 router = APIRouter()
 
@@ -119,14 +123,26 @@ documents = [
 ]
 
 retriever = RetrieverService(documents)
+redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
+
+redis_client = Redis.from_url(redis_url, decode_responses=True)
 
 def get_sql_service(db: Session = Depends(get_db)):
-    return SQLService(LLMService(retriever), DBRepository(db))
+    return SQLService(LLMService(retriever), DBRepository(db), redis_client)
 
 @router.post("/query")
-def query_data(request: QueryRequest, service: SQLService = Depends(get_sql_service)):
-    result = service.process_question(request.question)
+@cache(expire=600)
+async def query_data(request: QueryRequest, service: SQLService = Depends(get_sql_service)):
+    start = time.perf_counter()
+    result = await service.process_question(request.question)
+    time_cached = time.perf_counter() - start
+    print(f"Tempo com cache: {time_cached:.4f}s")
     return QueryResponse(**result)
+
+@router.get("/items")
+@cache(expire=60)  # Cache por 60 segundos
+async def get_items():
+    return {"items": ["a", "b", "c"]}
 
 @router.get("/ping-db")
 def ping_db(db: Session = Depends(get_db)):
