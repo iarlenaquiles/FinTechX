@@ -179,3 +179,25 @@ LangChain
 
 RAG Pattern
 
+## Passos para rodar a aplicação com Docker
+
+1. Clone o repositório (se ainda não tiver):
+
+```
+git clone <URL_DO_REPOSITORIO>
+cd <NOME_DO_REPOSITORIO>
+```
+
+2. Construa e suba os containers com Docker Compose:
+```
+docker compose up --build
+```
+3. A aplicação FastAPI estará rodando em:
+```
+http://localhost:8000
+```
+
+4. Para parar os containers, use:
+```
+docker compose down
+```
