@@ -2,8 +2,9 @@ import re
 from app.services.llm_service import LLMService
 from app.repositories.db_repository import DBRepository
 import hashlib
+from fastapi_cache.decorator import cache
 import json
-import redis
+from decimal import Decimal
 
 ALLOWED_TABLES = {"customers", "employees", "orders", "products", "order_details"}
 
@@ -22,45 +23,40 @@ class SQLService:
     def _hash(self, value: str) -> str:
         return hashlib.sha256(value.encode()).hexdigest()
     
-    def process_question(self, question: str):
+    async def process_question(self, question: str):
+        return await self._cached_process(question)
+    
+    def _hash(self, value: str) -> str:
+        return hashlib.sha256(value.encode()).hexdigest()
+    
+    @cache(expire=60 * 5)
+    async def _cached_process(self, question: str):
         # Verifica cache da pergunta
         question_key = f"question:{self._hash(question)}"
         cached = self.redis.get(question_key)
         if cached:
             return json.loads(cached)
+        
+        response = self.llm.generate_sql_with_context(question)
 
-        # Gera resposta do LLM
-        response = self.llm.answer_question(question)
-
-        # Extrai SQL
-        match = re.search(r"```sql\s+(.*?)```", response, re.DOTALL | re.IGNORECASE)
-        if not match:
+        sql_match = re.search(r"```sql\s+(.*?)```", response, re.DOTALL | re.IGNORECASE)
+        if not sql_match:
             raise ValueError("SQL não encontrado na resposta do LLM")
-        sql = match.group(1).strip()
+        sql = sql_match.group(1).strip()
 
-        # Valida SQL
+        explanation_match = re.search(r"Explicação:\s*(.*)", response, re.DOTALL | re.IGNORECASE)
+        explanation = explanation_match.group(1).strip() if explanation_match else "Sem explicação fornecida."
+
         self._validate_sql_tables(sql)
 
-        # Executa e armazena resultado da query
-        result = self._run_query_with_cache(sql)
+        rows = self.db.run_query(sql)
 
-        # Monta a resposta final
-        response_data = {
+        data = [dict(r) for r in rows]
+        response_data =  {
             "sql": re.sub(r"\s+", " ", sql).strip(),
-            "data": result,
-            "explanation": f"Consulta gerada para responder: “{question}”"
+            "data": data,
+            "explanation": explanation,
         }
 
-        # Armazena no cache
-        self.redis.setex(question_key, 600, json.dumps(response_data))  # 10 minutos
+        self.redis.setex(question_key, 600, json.dumps(response_data, default=str))  # 10 minutos
         return response_data
-    
-    def _run_query_with_cache(self, sql: str):
-        sql_key = f"sql:{self._hash(sql)}"
-        cached = self.redis.get(sql_key)
-        if cached:
-            return json.loads(cached)
-
-        data = self.db.run_query(sql)
-        self.redis.setex(sql_key, 600, json.dumps(data))
-        return data
