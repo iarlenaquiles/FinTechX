@@ -1,98 +1,100 @@
 # 🚀 FinTechX LLM-SQL API
 
-API inteligente que transforma **perguntas em linguagem natural** em **consultas SQL otimizadas** sobre o banco de dados **Northwind (MySQL)**, utilizando modelos de linguagem (LLMs), validação semântica e RAG (retrieval-augmented generation).
+An intelligent API that transforms **natural language questions** into **optimized SQL queries** over the **Northwind (MySQL)** database, using language models (LLMs), semantic validation, and RAG (retrieval-augmented generation).
 
 ---
 
-## 📌 Índice
+## 📌 Table of Contents
 
-- [✨ Visão Geral](#-visão-geral)
-- [🧠 Tecnologias Utilizadas](#-tecnologias-utilizadas)
-- [🧱 Arquitetura](#-arquitetura)
-- [🚀 Como Executar Localmente](#-como-executar-localmente)
-- [🔐 Variáveis de Ambiente](#-variáveis-de-ambiente)
-- [📡 Endpoints da API](#-endpoints-da-api)
-- [📊 Exemplos de Uso](#-exemplos-de-uso)
-- [🧪 Testes](#-testes)
-- [☁️ Deploy em Nuvem (CI/CD)](#-deploy-em-nuvem-cicd)
-- [📎 Referências](#-referências)
-
----
-
-## ✨ Visão Geral
-
-A FinTechX enfrenta desafios como:
-
-- Atendimento pouco personalizado  
-- Processos complexos  
-- Baixa capacidade preditiva e analítica  
-
-### 🎯 Solução proposta:
-Uma **API LLM-powered** que:
-
-- Interpreta perguntas humanas  
-- Gera SQL seguro e explicável  
-- Retorna dados e insights com alta performance  
+- [✨ Overview](#-overview)
+- [🧠 Technologies Used](#-technologies-used)
+- [🧱 Architecture](#-architecture)
+- [🚀 How to Run Locally](#-how-to-run-locally)
+- [🔐 Environment Variables](#-environment-variables)
+- [📡 API Endpoints](#-api-endpoints)
+- [📊 Usage Examples](#-usage-examples)
+- [🧪 Tests](#-tests)
+- [☁️ Cloud Deployment (CI/CD)](#-cloud-deployment-cicd)
+- [📎 References](#-references)
 
 ---
 
-## 🧠 Tecnologias Utilizadas
+## ✨ Overview
 
-| Categoria        | Tecnologia               |
-|------------------|---------------------------|
-| Backend API      | FastAPI                  |
-| Banco de Dados   | MySQL (Northwind)        |
-| LLM              | OpenAI GPT-4             |
-| Vetorização (RAG)| FAISS (opcional)         |
-| Cache            | Redis (opcional)         |
-| Validação SQL    | `sqlglot`, `sqlvalidator`|
-| Front (opcional) | Streamlit                |
-| Testes           | Pytest / Postman         |
-| CI/CD            | GitHub Actions / Render  |
+FinTechX faces challenges such as:
+
+- Low personalization in customer service  
+- Complex processes  
+- Limited predictive and analytical capabilities  
+
+### 🎯 Proposed Solution
+
+An **LLM-powered API** that:
+
+- Interprets human questions  
+- Generates secure and explainable SQL  
+- Returns data and insights with high performance  
 
 ---
 
-## 🧱 Arquitetura
+## 🧠 Technologies Used
+
+| Category | Technology |
+|---|---|
+| Backend API | FastAPI |
+| Database | MySQL (Northwind) |
+| LLM | OpenAI GPT-4 |
+| Vector Search (RAG) | FAISS (optional) |
+| Cache | Redis (optional) |
+| SQL Validation | `sqlglot`, `sqlvalidator` |
+| Frontend (optional) | Streamlit |
+| Testing | Pytest / Postman |
+| CI/CD | GitHub Actions / Render |
+
+---
+
+## 🧱 Architecture
 
 ```text
-Usuário → FastAPI → GPT-4 → Geração SQL → Validação SQL → MySQL (Northwind)
-                          ↑              ↓
-                      RAG / Cache   Dados + Explicação
+User → FastAPI → GPT-4 → SQL Generation → SQL Validation → MySQL (Northwind)
+                     ↑                 ↓
+                 RAG / Cache     Data + Explanation
 ```
 
-- Modular (seguindo SOLID)
+- Modular architecture (following SOLID principles)
+- Clear separation of responsibilities (services, repositories, schemas)
+- Extensible for metrics, security, and visual frontend
 
-- Separação clara de responsabilidades (services, repositories, schemas)
+---
 
-- Extensível para métricas, segurança e frontend visual
+## 🚀 How to Run Locally
 
-## 🚀 Como Executar Localmente
-1. Clone o projeto
+### 1. Clone the project
 
-```
+```bash
 git clone https://github.com/iarlenaquiles/fintechx.git
 cd fintechx
 ```
 
-2. Crie o ambiente virtual
+### 2. Create the virtual environment
 
-```
+```bash
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
-````
-
-3. Instale as dependências
-
 ```
+
+### 3. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-4. Configure variáveis de ambiente
-Crie um arquivo .env na raiz com ou copie do .env.example:
+### 4. Configure environment variables
 
-.env
-```
+Create a `.env` file in the project root or copy from `.env.example`:
+
+```env
 OPENAI_API_KEY=sk-...
 DATABASE_HOST=northwind-mysql-db.ccghzwgwh2c7.us-east-1.rds.amazonaws.com
 DATABASE_USERNAME=user_read_only
@@ -100,104 +102,129 @@ DATABASE_PASSWORD=laborit_teste_2789
 DATABASE_NAME=northwind
 ```
 
-5. Execute o servidor
+### 5. Run the server
 
-```
+```bash
 uvicorn app.main:app --reload
 ```
 
-Acesse a documentação Swagger em:
+Access Swagger documentation at:
 
 📍 http://localhost:8000/docs
 
-## 🔐 Variáveis de Ambiente
+---
 
-|Nome	|Descrição                    |
-|--------------|-----------------------|
-OPENAI_API_KEY	Chave da API da OpenAI
-DATABASE_HOST	Host do banco MySQL
-DATABASE_USERNAME	Usuário de leitura do banco
-DATABASE_PASSWORD	Senha do banco
-DATABASE_NAME	Nome do banco (northwind)
+## 🔐 Environment Variables
 
-## 📡 Endpoints da API
+| Name | Description |
+|---|---|
+| OPENAI_API_KEY | OpenAI API key |
+| DATABASE_HOST | MySQL database host |
+| DATABASE_USERNAME | Read-only database user |
+| DATABASE_PASSWORD | Database password |
+| DATABASE_NAME | Database name (`northwind`) |
 
-POST /query
-Consulta o banco de dados com linguagem natural.
+---
 
-Body:
-```
+## 📡 API Endpoints
+
+### POST `/query`
+
+Query the database using natural language.
+
+### Request Body
+
+```json
 {
-  "question": "Quais são os produtos mais vendidos?"
+  "question": "What are the best-selling products?"
 }
 ```
-Response:
-```
+
+### Response
+
+```json
 {
   "sql": "...",
   "data": [...],
-  "explanation": "Consulta criada para buscar os produtos mais vendidos em quantidade."
+  "explanation": "Query created to retrieve the best-selling products by quantity."
 }
 ```
 
-## 📊 Exemplos de Uso
-Perguntas suportadas:
+---
+
+## 📊 Usage Examples
+
+### Supported Questions
+
+```text
+Which products are the most popular among corporate customers?
+
+What is the sales volume by city?
+
+Which customers made the most purchases?
+
+What is the average ticket per purchase?
 ```
-Quais são os produtos mais populares entre os clientes corporativos?
 
-Qual o volume de vendas por cidade?
+---
 
-Quais são os clientes que mais compraram?
+## 🧪 Tests
 
-Qual é o ticket médio por compra?
-```
+### Run tests
 
-🧪 Testes
-Rodar os testes
-```
+```bash
 pytest tests/
 ```
-Ou importar a coleção no Postman (em tests/FinTechX.postman_collection.json).
 
-## ☁️ Deploy em Nuvem (CI/CD)
-Dockerfile incluso (opcional)
+Or import the Postman collection located at:
 
-Deploy em Render ou Railway:
+`tests/FinTechX.postman_collection.json`
 
-render.yaml para CI/CD automático
+---
 
-GitHub Actions (.github/workflows/deploy.yml)
+## ☁️ Cloud Deployment (CI/CD)
 
-## 📎 Referências
-FastAPI Documentation
+- Dockerfile included (optional)
+- Deploy on Render or Railway
+- `render.yaml` for automatic CI/CD
+- GitHub Actions (`.github/workflows/deploy.yml`)
 
-Northwind Database Schema
+---
 
-OpenAI API
+## 📎 References
 
-LangChain
+- FastAPI Documentation
+- Northwind Database Schema
+- OpenAI API
+- LangChain
+- RAG Pattern
 
-RAG Pattern
+---
 
-## Passos para rodar a aplicação com Docker
+## 🐳 Steps to Run the Application with Docker
 
-1. Clone o repositório (se ainda não tiver):
+### 1. Clone the repository (if you haven’t already)
 
+```bash
+git clone <REPOSITORY_URL>
+cd <REPOSITORY_NAME>
 ```
-git clone <URL_DO_REPOSITORIO>
-cd <NOME_DO_REPOSITORIO>
-```
 
-2. Construa e suba os containers com Docker Compose:
-```
+### 2. Build and start the containers using Docker Compose
+
+```bash
 docker compose up --build
 ```
-3. A aplicação FastAPI estará rodando em:
-```
+
+### 3. The FastAPI application will be available at:
+
+```text
 http://localhost:8000
 ```
 
-4. Para parar os containers, use:
-```
+### 4. To stop the containers, use:
+
+```bash
 docker compose down
 ```
+
